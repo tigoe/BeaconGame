@@ -1,0 +1,142 @@
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.4.4/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.4.4/addons/p5.dom.js"></script>
+
+  <script type="text/javascript">
+  var adminControls, adminDisplay, tokenUuid,
+  loginButton, logoutButton, claimBeaconButton, usersButton, beaconsButton;
+
+  function setup() {
+    noCanvas();
+    tokenUuid = document.getElementById('token');
+    adminControls = document.getElementById('adminPanel');
+    adminDisplay = document.getElementById('adminData');
+    usersButton = document.getElementById('Users');
+    beaconsButton = document.getElementById('Beacons');
+    loginButton = document.getElementById('login');
+    logoutButton = document.getElementById('logout');
+    claimBeaconButton = document.getElementById('claimBeacon');
+    loginButton.addEventListener('click', login, false);
+    logoutButton.addEventListener('click', login, false);
+    claimBeaconButton.addEventListener('click', claimBeacon, false);
+
+    usersButton.addEventListener('click', getAdminData, false);
+    beaconsButton.addEventListener('click', getAdminData, false);
+    document.addEventListener('keyup', showAdminPanel, false);
+    adminControls.hidden = true;
+  }
+
+  function showAdminPanel() {
+println(String.fromCharCode(event.keyCode));
+    if (String.fromCharCode(event.keyCode) === 'Q') {
+      adminControls.hidden = false;
+    }
+
+    if (String.fromCharCode(event.keyCode) === 'A') {
+      adminControls.hidden = true;
+    }
+
+  }
+
+  function getAdminData(command) {
+    var command = '/list' + event.target.id;
+    var data = {
+      username:username.value,
+      token:tokenUuid.value
+    };
+    println(command + ' ' + data);
+      httpPost(command, data, 'json', showAdminData);
+  }
+
+  function login(command) {
+    var command = '/' + event.target.id;
+    var request = {
+      username:username.value
+    };
+
+    if (command === 'logout') {
+      adminDisplay.innerHTML = null
+      adminControls.hidden = true;
+      username.value = null;
+      request.token = tokenUuid.value;  // only need token if logging out
+    }
+
+    function showResponse(data) {
+      println(JSON.stringify(data));
+      if (data.error) {
+        error.innerHTML = JSON.stringify(data);
+        message.innerHTML = null;
+      } else {
+        tokenUuid.value = data.token;
+        characteristic.value = data.characteristic;
+        message.innerHTML = JSON.stringify(data);
+        error.innerHTML = null;
+      }
+    }
+
+      httpPost(command, request, 'json', showResponse);
+  }
+
+  function claimBeacon(command) {
+    var command = '/beacon';
+    var request = {
+      token: token.value,
+      localname:  localname.value,
+      rssi: rssi.value,
+      characteristic: characteristic.value,
+      points: points.value
+    };
+
+    function showResponse(data) {
+      if (data.error) {
+        error.innerHTML = JSON.stringify(data);
+        message.innerHTML = null;
+      } else {
+        message.innerHTML = JSON.stringify(data);
+        error.innerHTML = null;
+      }
+    }
+      httpPost(command, request, 'json', showResponse);
+  }
+
+function showError(data) {
+  var errorDiv = document.getElementById('error');
+  errorDiv.innerHTML = JSON.stringify(data);
+}
+  function showAdminData(data) {
+      adminDisplay.innerHTML = JSON.stringify(data);
+  }
+
+  </script>
+  <title></title>
+</head>
+<body>
+  Login/Logout
+  <div id="loginForm">
+    username:  <input type="text" id="username" value=""><br />
+    token:  <input type="text" id="token" value=""><br />
+    <input id="login" type="submit" value="login"><br />
+    <input id="logout" type="submit" value="logout">
+  </div>
+
+
+  Claim Beacon
+  <div id="claimBeaconForm">
+    name:  <input type="text" id="localname" value=""><br />
+    rssi:  <input type="text" id="rssi" value=""><br />
+    characteristic:  <input type="text" id="characteristic" value=""><br />
+    characteristic value: <input type="text" id="points" value=""><br />
+    <input id="claimBeacon" type="submit" value="beacon">
+  </div>
+
+  <div id="message"></div>
+  <div id="error"></div>
+
+  <div id="adminPanel">
+    <button id="Users">Users</button><br />
+    <button id="Beacons">Beacons</button><br />
+    <div id="adminData"></div>
+  </div>
+</body>
+</html>

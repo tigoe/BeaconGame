@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <title></title>
+  </head>
+  <body>
+    Login
+    <form class="" action="/login" method="post">
+    username:  <input type="text" name="username" value=""><br />
+    <input type="submit" name="submit" value="Submit">
+  </form>
+
+Logout
+  <form class="" action="/logout" method="post">
+  username:  <input type="text" name="username" value=""><br />
+  token:  <input type="text" name="token" value=""><br />
+  <input type="submit" name="submit" value="Submit">
+</form>
+
+Claim Beacon
+  <form class="" action="/beacon" method="post">
+    token:  <input type="text" name="token" value=""><br />
+    name:  <input type="text" name="localname" value=""><br />
+    rssi:  <input type="text" name="rssi" value=""><br />
+    characteristic:  <input type="text" name="characteristic" value=""><br />
+    characteristic value: <input type="text" name="points" value=""><br />
+      <input type="submit" name="submit" value="Submit">
+      <input type="hidden" name="login" value="login">
+    </form>
+  </body>
+</html>
