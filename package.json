@@ -1,0 +1,34 @@
+{
+  "name": "beacon-game",
+  "version": "0.0.2",
+  "description": "A Bluetooth LE beacon game for noble, Arduino, and Raspberry Pi",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "node-uuid": "^1.4.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tigoe/BeaconGame.git"
+  },
+  "keywords": [
+    "Bluetooth",
+    "LE",
+    "noble",
+    "arduino",
+    "raspberry",
+    "pi"
+  ],
+  "author": "Tom Igoe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tigoe/BeaconGame/issues"
+  },
+  "homepage": "https://github.com/tigoe/BeaconGame#readme"
+}
