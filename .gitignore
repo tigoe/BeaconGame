@@ -1,3 +1,6 @@
 */node_modules/*
 config.js
 BeaconClient/platforms/*
+config.old.js
+
+config.js
