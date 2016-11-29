@@ -1,6 +1,6 @@
 # Beacon Game
 
-A Blueooth LE hide-and-seek game.  In this game, a number of Bluetooth LE peripherals are set up as beacons around the playing space. Players search for the hidden beacons and submit their data to a server via HTTP request. The beacons will have various names, but they’ll all have a service on them with the same uuid. When any player gains enough points, the server activates a special hidden beacon called the Golden Egg. The first player to claim the Golden Egg wins.
+A Bluetooth LE hide-and-seek game.  In this game, a number of Bluetooth LE peripherals are set up as beacons around the playing space. Players search for the hidden beacons and submit their data to a server via HTTP request. The beacons will have various names, but they’ll all have a service on them with the same uuid. When any player gains enough points, the server activates a special hidden beacon called the Golden Egg. The first player to claim the Golden Egg wins.
 
 ## Contents of the Repository
 * server.js - the server program. Includes a public folder containing two web clients:
