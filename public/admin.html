@@ -4,7 +4,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.4.4/addons/p5.dom.js"></script>
 
   <script type="text/javascript">
-  var adminControls, adminDisplay, tokenUuid,
+  var adminControls, adminDisplay, tokenUuid, errorDisplay, messageDisplay,
   loginButton, logoutButton, claimBeaconButton, usersButton, beaconsButton;
 
   function setup() {
@@ -12,6 +12,8 @@
     tokenUuid = document.getElementById('token');
     adminControls = document.getElementById('adminPanel');
     adminDisplay = document.getElementById('adminData');
+    errorDisplay = document.getElementById('error');
+    messageDisplay = document.getElementById('message');
     usersButton = document.getElementById('Users');
     beaconsButton = document.getElementById('Beacons');
     loginButton = document.getElementById('login');
@@ -27,60 +29,57 @@
     adminControls.hidden = true;
   }
 
+  // shows the admin panel:
   function showAdminPanel() {
-    //println(String.fromCharCode(event.keyCode));
-    if (String.fromCharCode(event.keyCode) === 'Q') {
+    if (String.fromCharCode(event.keyCode) === 'Q') { // if user types A
       adminControls.hidden = false;
     }
 
-    if (String.fromCharCode(event.keyCode) === 'A') {
+    if (String.fromCharCode(event.keyCode) === 'A') { // if user types Q
       adminControls.hidden = true;
     }
   }
 
+  // gets list of beacons and users, if logged in client is an admin:
   function getAdminData(command) {
-    var command = '/list' + event.target.id;
+    var command = '/list' + event.target.id;    // list expects username & token
     var data = {
       username:username.value,
       token:tokenUuid.value
     };
-    println(command + ' ' + data);
-    httpPost(command, data, 'json', showAdminData);
+
+    httpPost(command, data, 'json', show);
   }
 
+  // logs user into or out of server:
   function login(command) {
-    var command = '/' + event.target.id;
+    var command = '/' + event.target.id; // get path from button name
     var request = {
-      username:username.value,
-      adminKey: secret.value
+      username:username.value,          // send user name
+      adminKey: secret.value            // send secret field data
     };
 
     if (command === 'logout') {
-      adminDisplay.innerHTML = null
-      adminControls.hidden = true;
-      username.value = null;
+      adminDisplay.innerHTML = null;    // clear admin display
+      adminControls.hidden = true;      // hide admin controls
+      username.value = null;            // clear username
       request.token = tokenUuid.value;  // only need token if logging out
     }
 
-    function showResponse(data) {
-      println(JSON.stringify(data));
-      if (data.error) {
-        error.innerHTML = JSON.stringify(data);
-        message.innerHTML = null;
-      } else {
-        tokenUuid.value = data.token;
-        characteristic.value = data.characteristic;
-        message.innerHTML = JSON.stringify(data);
-        error.innerHTML = null;
-      }
+    // update page with server's response:
+    function getResponse(data) {
+      show(data);
+      tokenUuid.value = data.token;
+      characteristic.value = data.characteristic;
     }
+    // make the HTTP POST call:
+    httpPost(command, request, 'json', getResponse);
+  } // end of login/logout function
 
-    httpPost(command, request, 'json', showResponse);
-  }
-
+  // make the POST request to the server to claim a beacon:
   function claimBeacon(command) {
     var command = '/beacon';
-    var request = {
+    var request = {               // get all data from user fields
       token: token.value,
       localname:  localname.value,
       rssi: rssi.value,
@@ -88,56 +87,53 @@
       points: points.value
     };
 
-    function showResponse(data) {
-      if (data.error) {
-        error.innerHTML = JSON.stringify(data);
-        message.innerHTML = null;
-      } else {
-        message.innerHTML = JSON.stringify(data);
-        error.innerHTML = null;
-      }
+    // make the HTTP POST call:
+    httpPost(command, request, 'json', show);
+  }   // end of claimBeacon function
+
+
+  function show(data) {
+    // if there's an error, use the error div:
+    if (data.error) {
+      error.innerHTML = JSON.stringify(data);
+      messageDisplay.innerHTML = null;
+    } else {
+      // if there's no error, use the message div:
+      messageDisplay.innerHTML = JSON.stringify(data);
+      error.innerHTML = null;
     }
-    httpPost(command, request, 'json', showResponse);
   }
 
-  function showError(data) {
-    var errorDiv = document.getElementById('error');
-    errorDiv.innerHTML = JSON.stringify(data);
-  }
-  function showAdminData(data) {
-    adminDisplay.innerHTML = JSON.stringify(data);
-  }
-
-  </script>
-  <title></title>
-</head>
-<body>
-  Login/Logout
-  <div id="loginForm">
+    </script>
+    <title></title>
+    </head>
+    <body>
+    Login/Logout
+    <div id="loginForm">
     username:  <input type="text" id="username" value=""><br />
     token:  <input type="text" id="token" value=""><br />
     <input id="login" type="submit" value="login"><br />
     <input id="logout" type="submit" value="logout">
-  </div>
+    </div>
 
 
-  Claim Beacon
-  <div id="claimBeaconForm">
+    Claim Beacon
+    <div id="claimBeaconForm">
     name:  <input type="text" id="localname" value=""><br />
     rssi:  <input type="text" id="rssi" value=""><br />
     characteristic:  <input type="text" id="characteristic" value=""><br />
     characteristic value: <input type="text" id="points" value=""><br />
     <input id="claimBeacon" type="submit" value="beacon">
-  </div>
+    </div>
 
-  <div id="message"></div>
-  <div id="error"></div>
+    <div id="message"></div>
+    <div id="error"></div>
 
-  <div id="adminPanel">
+    <div id="adminPanel">
     <button id="Users">Users</button><br />
     <button id="Beacons">Beacons</button><br />
-    secret:  <input type="text" id="secret" value=""><br />
+    secret:  <input type="password" id="secret" value=""><br />
     <div id="adminData"></div>
-  </div>
-</body>
-</html>
+    </div>
+    </body>
+    </html>

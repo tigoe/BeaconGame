@@ -1,30 +1,100 @@
 <html>
   <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.4.4/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.4.4/addons/p5.dom.js"></script>
+
+    <script type="text/javascript">
+    var tokenUuid, errorDisplay, messageDisplay,
+    loginButton, logoutButton, claimBeaconButton;
+
+    function setup() {
+      noCanvas();
+      tokenUuid = document.getElementById('token');
+      errorDisplay = document.getElementById('error');
+      messageDisplay = document.getElementById('message');
+      loginButton = document.getElementById('login');
+      logoutButton = document.getElementById('logout');
+      claimBeaconButton = document.getElementById('claimBeacon');
+      loginButton.addEventListener('click', login, false);
+      logoutButton.addEventListener('click', login, false);
+      claimBeaconButton.addEventListener('click', claimBeacon, false);
+    }
+
+    // logs user into or out of server:
+    function login(command) {
+      var command = '/' + event.target.id; // get path from button name
+      var request = {
+        username:username.value          // send user name
+      };
+
+      if (command === 'logout') {
+        adminDisplay.innerHTML = null;    // clear admin display
+        adminControls.hidden = true;      // hide admin controls
+        username.value = null;            // clear username
+        request.token = tokenUuid.value;  // only need token if logging out
+      }
+
+      // update page with server's response:
+      function getResponse(data) {
+        show(data);
+        tokenUuid.value = data.token;
+        characteristic.value = data.characteristic;
+      }
+      // make the HTTP POST call:
+      httpPost(command, request, 'json', getResponse);
+    } // end of login/logout function
+
+    // make the POST request to the server to claim a beacon:
+    function claimBeacon(command) {
+      var command = '/beacon';
+      var request = {               // get all data from user fields
+        token: token.value,
+        localname:  localname.value,
+        rssi: rssi.value,
+        characteristic: characteristic.value,
+        points: points.value
+      };
+
+      // make the HTTP POST call:
+      httpPost(command, request, 'json', show);
+    }   // end of claimBeacon function
+
+
+    function show(data) {
+      // if there's an error, use the error div:
+      if (data.error) {
+        error.innerHTML = JSON.stringify(data);
+        messageDisplay.innerHTML = null;
+      } else {
+        // if there's no error, use the message div:
+        messageDisplay.innerHTML = JSON.stringify(data);
+        error.innerHTML = null;
+      }
+    }
+
+      </script>
     <title></title>
   </head>
   <body>
-    Login
-    <form class="" action="/login" method="post">
-    username:  <input type="text" name="username" value=""><br />
-    <input type="submit" name="submit" value="Submit">
-  </form>
+    Login/Logout
+    <div id="loginForm">
+    username:  <input type="text" id="username" value=""><br />
+    token:  <input type="text" id="token" value=""><br />
+    <input id="login" type="submit" value="login"><br />
+    <input id="logout" type="submit" value="logout">
+    </div>
 
-Logout
-  <form class="" action="/logout" method="post">
-  username:  <input type="text" name="username" value=""><br />
-  token:  <input type="text" name="token" value=""><br />
-  <input type="submit" name="submit" value="Submit">
-</form>
 
-Claim Beacon
-  <form class="" action="/beacon" method="post">
-    token:  <input type="text" name="token" value=""><br />
-    name:  <input type="text" name="localname" value=""><br />
-    rssi:  <input type="text" name="rssi" value=""><br />
-    characteristic:  <input type="text" name="characteristic" value=""><br />
-    characteristic value: <input type="text" name="points" value=""><br />
-      <input type="submit" name="submit" value="Submit">
-      <input type="hidden" name="login" value="login">
-    </form>
+    Claim Beacon
+    <div id="claimBeaconForm">
+    name:  <input type="text" id="localname" value=""><br />
+    rssi:  <input type="text" id="rssi" value=""><br />
+    characteristic:  <input type="text" id="characteristic" value=""><br />
+    characteristic value: <input type="text" id="points" value=""><br />
+    <input id="claimBeacon" type="submit" value="beacon">
+    </div>
+
+    <div id="message"></div>
+    <div id="error"></div>
   </body>
 </html>

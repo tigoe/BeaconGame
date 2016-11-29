@@ -1,4 +1,4 @@
-*/node_modules/*
+node_modules/*
 
 BeaconClient/platforms/*
 config.private.js

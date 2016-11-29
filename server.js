@@ -14,7 +14,7 @@ var config = require('./config.js');
 var express = require('express');         // include express.js
 var app = express();                      // a local instance of it
 var bodyParser = require('body-parser');  // include body-parser
-var uuid = require('node-uuid');          // include a UUID generator
+var uuid = require('uuid');               // include a UUID generator
 var http = require('http');               // include http to make a client
 
 // the service UUID and characteristic UUID for the game:
