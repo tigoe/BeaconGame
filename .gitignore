@@ -1,8 +1,5 @@
 */node_modules/*
-config.js
+
 BeaconClient/platforms/*
-config.old.js
+config.private.js
 
-config.js
-
-config.js
