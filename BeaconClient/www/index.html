@@ -4,7 +4,10 @@
 Logs in and out of the beacon game. This is a stub for the whole beacon game
 client application.
 
+NOTE: in the content-security-policy meta tag, you need to include  connect-src 'self' http://xxx.xxx.xxx.xxx:yyyy; where the address and port replace the xxx.xxx.xxx.xxx:yyyy
+
 created 18 April 2015
+modified 27 Nov 2015
 by Tom Igoe -->
 
 <html>
@@ -12,12 +15,15 @@ by Tom Igoe -->
   <meta charset="utf-8" />
   <meta name="format-detection" content="telephone=no" />
   <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'
+  http://xxx.xxx.xxx.xxx:yyyy; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
   <link rel="stylesheet" type="text/css" href="css/index.css" />
   <title>Test</title>
 </head>
 <body>
   <div class="app">
     <div id="loginForm">
+      Server address:  <input type="text" id="serverAddress" value=""><br />
       username:  <input type="text" id="username" value=""><br />
       token:  <input type="text" id="token" value=""><br />
       <input id="loginButton" type="submit" name="login" value="login">&nbsp;
@@ -41,8 +47,5 @@ by Tom Igoe -->
 
   <script type="text/javascript" src="cordova.js"></script>
   <script type="text/javascript" src="js/index.js"></script>
-  <script type="text/javascript">
-  app.initialize();
-  </script>
 </body>
 </html>

@@ -18,17 +18,6 @@ var beaconData = {
   points:null
 };
 
-// data about the server:
-var server = {
-  url: 'http://104.236.16.105'
-};
-
-// data about the user:
-var user = {
-  name: 'ti8',
-  token: null
-};
-
 // the app functions:
 var app = {
   // initialize runs when the app starts
@@ -38,6 +27,7 @@ var app = {
 
   // bindEvents adds listeners for the DOM elements:
   bindEvents: function() {
+    console.log("bindEvents");
     document.addEventListener('deviceready', this.onDeviceReady, false);
     loginButton.addEventListener('touchend', this.login, false);
     logoutButton.addEventListener('touchend', this.logout, false);
@@ -53,34 +43,34 @@ var app = {
 
   // login is called by the login button:
   login: function() {
-    data = 'username=' + user.name;     // format the data as form-urlencoded
-    var target = server.url + '/login'; // add the route to the base URL
+    console.log("login");
+    data = 'username=' + username.value;     // format the data as form-urlencoded
+    var target = serverAddress.value + '/login'; // add the route to the base URL
     app.postRequest(data, target);      // make the POST request
   },
   // logout is called by the logout button:
   logout: function() {
-    data = 'username=' + user.name +    // format the data as form-urlencoded
-    '&token=' + user.token;             // add the user token as well
-    var target = server.url + '/logout';// add the route to the base URL
+    data = 'username=' + username.value +    // format the data as form-urlencoded
+    '&token=' + token.value;             // add the user token as well
+    var target = serverAddress.value + '/logout';// add the route to the base URL
     app.postRequest(data, target);      // make the POST request
   },
 
-
+// scan for 5 seconds:
   scan: function() {
     ble.scan([service.value], 5, app.listBeacons, app.showError);
   },
 
   connectToDevice: function(event) {
-    console.log('connectToDevice');
-    var deviceId = event.target.dataset.deviceId
-    console.log(deviceId);
-    message.innerHTML = deviceID;
+    var deviceId = event.target.dataset.deviceId;
 
-    var deviceId = e.target.dataset.deviceId,
-    onConnect = function() {
+    // put name and RSSI into fields:
+    localname.value = event.target.dataset.name;
+    rssi.value = event.target.dataset.rssi;
 
+     var onConnect = function () {
       // get service and characteristic from UI fields
-      ble.startNotification(deviceId, service.value, characteristic.value, app.onBeaconData, app.showError);
+      ble.read(deviceId, service.value, characteristic.value, app.onBeaconData, app.showError);
     };
 
     ble.connect(deviceId, onConnect, app.onError);
@@ -92,32 +82,35 @@ var app = {
     html = '<b>' + device.name + '</b><br/>' +
     'RSSI: ' + device.rssi + '&nbsp;|&nbsp;' +
     device.id;
-
+    // get the device info and save it to the list item
+    // so you can pass it when the list item is touched:
     listItem.dataset.deviceId = device.id;
+    listItem.dataset.name = device.name;
+    listItem.dataset.rssi = device.rssi;
     listItem.innerHTML = html;
     deviceList.appendChild(listItem);
   },
 
-  onBeaconData: function() {
+  onBeaconData: function(data) {
+      var bytes = new Uint8Array(data);
 
+      console.log("I got: " + bytes[0]);
+      points.value = bytes[0];
   },
 
   claimBeacon: function() {
 
   },
-  
+
   // postRequest is called by the login and logout functions:
   postRequest: function(data, target) {
     // instantiate a request object
     var request = new XMLHttpRequest();
-    // get the user token:
-    var tokenField = document.getElementById('token');
     // open a POST request for the URL and route:
     request.open("POST", target, true);
     // set headers for the POST:
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    request.setRequestHeader("Content-length", data.length);
-
+    
     // this is called if the ready state of the request changes
     // (i.e. if a response comes in):
     request.onreadystatechange = function() {
@@ -127,9 +120,7 @@ var app = {
         responseJson = JSON.parse(request.responseText);
 
         // put the token in the token field so you don't have to type it:
-        tokenField.value = responseJson.token;
-        // put the rest of the results in the appropriate objects:
-        user.token = responseJson.token;
+        token.value = responseJson.token;
         characteristic.value = responseJson.characteristic;
         service.value = responseJson.service;
         // show the whole result in the postResult div:
@@ -145,3 +136,5 @@ var app = {
     message.innerHTML = error;
   }
 };
+
+app.initialize();
