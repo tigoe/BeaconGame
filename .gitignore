@@ -2,3 +2,7 @@
 
 BeaconClient/platforms/*
 config.private.js
+
+config.js
+
+config.template.js
