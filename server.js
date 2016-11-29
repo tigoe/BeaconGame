@@ -22,6 +22,7 @@ var serviceUuid = config.serviceUuid;
 var characteristicUuid = config.characteristicUuid;
 var users = config.users;
 var beacons = config.beacons;
+var adminKey = config.adminKey;
 var gameOver = false;
 var winner = '';
 
@@ -44,13 +45,14 @@ function login(request, response) {
   if (request.method === 'GET') {
     thisUser.username = request.params.username;  // get submitted username
     thisUser.ip = request.ip; // get submitted client IP address
+    thisUser.adminKey = request.params.adminKey; // get user admin key, if submitted
   }
 
   if (request.method === 'POST') {
       thisUser.username = request.body.username;  // get submitted username
       thisUser.ip = request.ip;                  // get submitted client IP address
+      thisUser.adminKey = request.body.adminKey;  // get user admin key, if submitted
   }
-  console.log(request.body);
   var result = {};               // JSON object for returning results
 
   userIndex = -1;                     // index of the requested user in the list
@@ -76,6 +78,10 @@ function login(request, response) {
         // if they are logged in from another address,
         // don't let them re-register:
         result.error = thisUser.username + ' is logged in from another address.';
+      }
+      if (thisUser.adminKey === adminKey) {
+        // they get admin privileges
+        user.admin = true;
       }
       // you'll need the index of this user in the list later,
       // so save it to a variable:

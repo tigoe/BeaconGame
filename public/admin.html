@@ -28,7 +28,7 @@
   }
 
   function showAdminPanel() {
-println(String.fromCharCode(event.keyCode));
+    //println(String.fromCharCode(event.keyCode));
     if (String.fromCharCode(event.keyCode) === 'Q') {
       adminControls.hidden = false;
     }
@@ -36,7 +36,6 @@ println(String.fromCharCode(event.keyCode));
     if (String.fromCharCode(event.keyCode) === 'A') {
       adminControls.hidden = true;
     }
-
   }
 
   function getAdminData(command) {
@@ -46,13 +45,14 @@ println(String.fromCharCode(event.keyCode));
       token:tokenUuid.value
     };
     println(command + ' ' + data);
-      httpPost(command, data, 'json', showAdminData);
+    httpPost(command, data, 'json', showAdminData);
   }
 
   function login(command) {
     var command = '/' + event.target.id;
     var request = {
-      username:username.value
+      username:username.value,
+      adminKey: secret.value
     };
 
     if (command === 'logout') {
@@ -75,7 +75,7 @@ println(String.fromCharCode(event.keyCode));
       }
     }
 
-      httpPost(command, request, 'json', showResponse);
+    httpPost(command, request, 'json', showResponse);
   }
 
   function claimBeacon(command) {
@@ -97,15 +97,15 @@ println(String.fromCharCode(event.keyCode));
         error.innerHTML = null;
       }
     }
-      httpPost(command, request, 'json', showResponse);
+    httpPost(command, request, 'json', showResponse);
   }
 
-function showError(data) {
-  var errorDiv = document.getElementById('error');
-  errorDiv.innerHTML = JSON.stringify(data);
-}
+  function showError(data) {
+    var errorDiv = document.getElementById('error');
+    errorDiv.innerHTML = JSON.stringify(data);
+  }
   function showAdminData(data) {
-      adminDisplay.innerHTML = JSON.stringify(data);
+    adminDisplay.innerHTML = JSON.stringify(data);
   }
 
   </script>
@@ -136,6 +136,7 @@ function showError(data) {
   <div id="adminPanel">
     <button id="Users">Users</button><br />
     <button id="Beacons">Beacons</button><br />
+    secret:  <input type="text" id="secret" value=""><br />
     <div id="adminData"></div>
   </div>
 </body>
