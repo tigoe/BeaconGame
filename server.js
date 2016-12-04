@@ -23,6 +23,7 @@ var characteristicUuid = config.characteristicUuid;
 var users = config.users;
 var beacons = config.beacons;
 var adminKey = config.adminKey;
+var beaconRange = config.beaconLimit;
 var gameOver = false;
 var winner = '';
 
@@ -245,7 +246,7 @@ function listUsers(request, response) {
       // if one matches the request name:
       if (request.body.localname === beacon.name) {
         // check rssi:
-        if (request.body.rssi < beacon.rssiLimit) {
+        if (Math.abs(request.body.rssi - beacon.rssiLimit) > beaconRange) {
           result.error = 'not close enough to claim beacon';
         }
         // check owner:
