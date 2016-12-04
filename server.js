@@ -24,6 +24,7 @@ var users = config.users;
 var beacons = config.beacons;
 var adminKey = config.adminKey;
 var beaconRange = config.beaconLimit;
+var finalBeaconName = config.beacons[config.beacons.length-1].name;
 var gameOver = false;
 var winner = '';
 
@@ -247,20 +248,23 @@ function listUsers(request, response) {
       if (request.body.localname === beacon.name) {
         // check rssi:
         if (Math.abs(request.body.rssi - beacon.rssiLimit) > beaconRange) {
-          result.error = 'not close enough to claim beacon';
+          result.name = beacon.name;
+          result.error = 'not in range to claim beacon';
         }
         // check owner:
         if (beacon.owner) {
+          result.name = beacon.name;
           result.error = 'beacon already claimed';
         }
         // check points:
         if (request.body.points != beacon.points) {
-          result.error = 'incorrect characteristic value';
+          result.name = beacon.name;
+          result.error = 'incorrect points value';
         }
         // if there's still no error, credit the user:
         if (!result.error) {
-          result.message = 'success';
-          result.localname = beacon.localname;  // set the result localname for response
+          result.message = 'success. Beacon claimed';
+          result.name = beacon.name;  // set the result localname for response
           users.forEach(function(user) {        // iterate over the user list
             if (user === thisUser) {            // find the user who submitted this
               beacon.owner = user.username;     // set the beacon owner
@@ -268,9 +272,9 @@ function listUsers(request, response) {
               checkScores();                    // check to see if anyone's score > 50
               result.username = user.username;  // set the result username
               result.score = user.score;        // set the result user's score
-              if (beacon.localname === 'GoldenEgg') {
+              if (beacon.name === finalBeaconName) {
                 winner = user.username;
-                result.message += user.username + ' has claimed the golden egg.';
+                result.message += user.username + ' has claimed the final beacon.';
                 gameOver = true;
               }
             }
