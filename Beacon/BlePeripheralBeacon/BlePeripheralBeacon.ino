@@ -48,9 +48,15 @@ void loop() {
     // central connected to peripheral
     Serial.print("Connected to central: ");
     Serial.println(central.address());
-
+    // note the time right before the while loop:
+    long connectTime = millis();
     while (central.connected()) {
       digitalWrite(connectedLED, HIGH);
+      // if the central stays connected for longer than 
+      // thirty seconds, disconnect it:
+      if (millis() - connectTime > 30000) {
+        central.disconnect();
+      }
     }
     // when the central disconnects, turn the LED off:
     digitalWrite(connectedLED, LOW);
@@ -58,7 +64,7 @@ void loop() {
     Serial.println(central.address());
     // increment connect count:
     connectCount++;
-// if it's been connected to enough times, make it the final value:
+    // if it's been connected to enough times, make it the final value:
     if (connectCount > connectThreshold) {
       // set the final value:
       counterCharacteristic.setValue(finalValue);
