@@ -5,10 +5,6 @@ in Express.js 4.0
 created 15 Mar 2015
 modified 22 Nov 2016
 by Tom Igoe
-
-TO DO:  Add in a feature to send different formats of UUID, using the parse/unparse
-functions from the npm UUID library.
-
 */
 var config = require('./config.js');
 var express = require('express');         // include express.js
@@ -305,14 +301,10 @@ function listUsers(request, response) {
   }
 
   function unlockGoldenEgg() {
-    // get the serviceUuid from the goldenEgg JSON and remove dashes:
-    var myUuid = config.goldenEgg.serviceUuid.split('-');
-    var shortUuid = myUuid.join('');
-
     // make POST data for request to goldenEgg server:
     var postData =JSON.stringify({
       serviceName: config.goldenEgg.serviceName,
-      uuid: shortUuid
+      uuid: config.goldenEgg.serviceUuid
     });
 
     // set up the options for the request.

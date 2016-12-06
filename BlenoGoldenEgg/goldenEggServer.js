@@ -86,7 +86,10 @@ function stopService(request, response) {
 function changeService(request, response, start) {
   var result = {};
   var thisName = request.body.serviceName;
-  var thisService = request.body.uuid;
+  // get the uuid and remove the dashes:
+  var thisService = request.body.uuid.split('-');
+  thisService = thisService.join('');
+
   result.timestamp = new Date();
   result.state = start;
 
