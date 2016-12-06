@@ -43,14 +43,14 @@ var bluetoothState = null;  // bluetooth radio state
 
 // define the service's characteristic:
 var pointsCharacteristic = new Characteristic({
-  uuid: '', //  characteristic UUID
-  properties: [ 'notify','read' ],              //  characteristic properties
+  uuid: 'A495FF25C5B14B44B5121370F02D74DE', //  characteristic UUID
+  properties: [ 'read' ],              //  characteristic properties
   value: data                                   // characteristic value
 });
 
 // define the service:
 var gameService = new PrimaryService({
-  uuid: '', // service UUID
+  uuid: 'A495FF20C5B14B44B5121370F02D74DE', // service UUID
   characteristics: [ pointsCharacteristic]      // service characteristic
 });
 
