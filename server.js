@@ -340,9 +340,7 @@ function listUsers(request, response) {
         if (error) console.log(error);
         console.log(result);
         beacons.push(config.goldenEgg);       // add the golden egg to the beacon list
-        //unlocked = true;      // allow others to claim the golden egg now
       });
-
     }
 
     // make the actual request:
