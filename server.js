@@ -24,7 +24,7 @@ var users = config.users;
 var beacons = config.beacons;
 var adminKey = config.adminKey;
 var beaconRange = config.beaconLimit;
-var finalBeaconName = config.beacons[config.beacons.length-1].name;
+var finalBeaconName = config.goldenEgg.serviceName;
 var gameOver = false;
 var winner = '';
 
@@ -157,7 +157,6 @@ function releaseBeacons(user) {
   });
 }
 
-
 function clearUser(request, response) {
   var result = {};
 
@@ -261,9 +260,16 @@ function listUsers(request, response) {
           result.name = beacon.name;
           result.error = 'incorrect points value';
         }
+
+        // check if game over:
+        if (gameOver) {
+          result.name = beacon.name;
+          result.error = 'game over. ' + winner + ' claimed the winning beacon.';
+        }
+
         // if there's still no error, credit the user:
         if (!result.error) {
-          result.message = 'success. Beacon claimed';
+          result.message = 'success. Beacon claimed. ';
           result.name = beacon.name;  // set the result localname for response
           users.forEach(function(user) {        // iterate over the user list
             if (user === thisUser) {            // find the user who submitted this
@@ -274,7 +280,7 @@ function listUsers(request, response) {
               result.score = user.score;        // set the result user's score
               if (beacon.name === finalBeaconName) {
                 winner = user.username;
-                result.message += user.username + ' has claimed the final beacon.';
+                result.message += user.username + ' has claimed the final beacon. Game over.';
                 gameOver = true;
               }
             }
@@ -299,10 +305,14 @@ function listUsers(request, response) {
   }
 
   function unlockGoldenEgg() {
-    // make the POST data a JSON object and stringify it:
+    // get the serviceUuid from the goldenEgg JSON and remove dashes:
+    var myUuid = config.goldenEgg.serviceUuid.split('-');
+    var shortUuid = myUuid.join('');
+
+    // make POST data for request to goldenEgg server:
     var postData =JSON.stringify({
       serviceName: config.goldenEgg.serviceName,
-      uuid: config.goldenEgg.uuid
+      uuid: shortUuid
     });
 
     // set up the options for the request.
@@ -329,6 +339,8 @@ function listUsers(request, response) {
       response.on('end', function (error) {
         if (error) console.log(error);
         console.log(result);
+        beacons.push(config.goldenEgg);       // add the golden egg to the beacon list
+        //unlocked = true;      // allow others to claim the golden egg now
       });
 
     }
@@ -343,7 +355,6 @@ function listUsers(request, response) {
   // start the server:
   var server = app.listen(8080, serverStart);
   // start the listeners for GET requests:
-  //app.get('/files/:name', serveFiles);  // GET handler for all static files
   app.post('/listBeacons', listBeacons);
   app.post('/listUsers', listUsers);
   app.post('/login/', login);           // login page (TBD)

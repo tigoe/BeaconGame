@@ -1,11 +1,28 @@
 {
-  "name": "blenoGoldenEgg",
-  "version": "0.0.1",
-  "description": "",
+  "name": "bleno-golden-egg",
+  "version": "0.0.2",
+  "description": "A BLE peripheral and web server",
   "main": "goldenEgg.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Tom Igoe",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "bleno": "^0.4.1",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://www.github.com/tigoe/BeaconGame"
+  },
+  "keywords": [
+    "Bluetooth",
+    "LE",
+    "bleno",
+    "noble",
+    "express"
+  ]
 }

@@ -16,13 +16,23 @@ uuid: the service uuid. Must match the uuid for gameService, in this code.
 /stop stops it
 
 created 16 Apr 2015
+updated 6 Dec. 2016
 by Tom Igoe
 */
 
+var config = require('../config.js');
 var bleno = require('bleno');
 var express = require('express');         // include express.js
 var app = express();                      // a local instance of it
 var bodyParser = require('body-parser');  // include body-parser
+
+var deviceConfig = config.goldenEgg;
+var serviceName = deviceConfig.serviceName; // peripheral's localName
+
+var points = new Buffer(1);   // Buffer for characteristic value
+points[0] = deviceConfig.points;               // actual value of the characteristic
+process.env['BLENO_DEVICE_NAME'] = serviceName;
+
 app.use(express.static('public'));                  // static files go in /public
 app.use(bodyParser.json());                         // for  application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for application/x-www-form-urlencoded
@@ -36,22 +46,20 @@ function serverStart() {
 var PrimaryService = bleno.PrimaryService;    // instantiate PrimaryService
 var Characteristic = bleno.Characteristic;    // instantiate PrimaryCharacteristic
 
-var serviceName = 'GoldenEgg';               // peripheral's localName
-var data = new Buffer(1);   // Buffer for characteristic value
-data[0] = 22;               // actual value of the characteristic
+
 var bluetoothState = null;  // bluetooth radio state
 
 // define the service's characteristic:
 var pointsCharacteristic = new Characteristic({
-  uuid: 'A495FF25C5B14B44B5121370F02D74DE', //  characteristic UUID
-  properties: [ 'read' ],              //  characteristic properties
-  value: data                                   // characteristic value
+  uuid: deviceConfig.characteristicUuid, //  characteristic UUID
+  properties: [ 'read' ],                //  characteristic properties
+  value: points                          // characteristic value
 });
 
 // define the service:
 var gameService = new PrimaryService({
-  uuid: 'A495FF20C5B14B44B5121370F02D74DE', // service UUID
-  characteristics: [ pointsCharacteristic]      // service characteristic
+  uuid: deviceConfig.serviceUuid,         // service UUID
+  characteristics: [pointsCharacteristic] // service characteristic
 });
 
 function readme(request, response) {
@@ -98,7 +106,7 @@ function changeService(request, response, start) {
 
   if (!result.error)  {
     if (start === true){
-      bleno.startAdvertising(thisName, [gameService.uuid]);
+      bleno.startAdvertising(serviceName, [gameService.uuid]);
       result.serviceName = thisName;
       result.uuid = thisService;
       console.log('advertising ' + thisName);
@@ -113,14 +121,12 @@ function changeService(request, response, start) {
   console.log('\n');
 }
 
-// event handler for Bluetooth state change:
-bleno.on('stateChange', function(state) {
+function startPeripheral(state) {
   console.log('on -> stateChange: ' + state);
   bluetoothState = state;
-});
+}
 
-// event handler for advertising start:
-bleno.on('advertisingStart', function(error) {
+function startAdvertising(error) {
   console.log('Bluetooth on. advertisingStart: ')
   if (error) {
     console.log('error ' + error);
@@ -136,7 +142,12 @@ bleno.on('advertisingStart', function(error) {
       }
     });
   }
-});
+}
+
+// listener for radio turning on:
+bleno.on('stateChange', startPeripheral);
+// listener for advertising start:
+bleno.on('advertisingStart', startAdvertising);
 
 // start the server:
 var server = app.listen(8080, serverStart);

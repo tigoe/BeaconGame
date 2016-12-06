@@ -31,12 +31,8 @@
 
   // shows the admin panel:
   function showAdminPanel() {
-    if (String.fromCharCode(event.keyCode) === 'Q') { // if user types A
-      adminControls.hidden = false;
-    }
-
-    if (String.fromCharCode(event.keyCode) === 'A') { // if user types Q
-      adminControls.hidden = true;
+    if (String.fromCharCode(event.keyCode) === ' ') { // if user types space
+      adminControls.hidden = !adminControls.hidden;   // toggle the admin panel
     }
   }
 
